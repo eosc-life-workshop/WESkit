@@ -114,3 +114,58 @@ The demo stack can also be deployed together with a Keycloak service for authori
 python weskit_stack.py start --login --minio
 python weskit_stack.py test --login
 ```
+
+# Demo workflow submission
+The following describes the submission of a workflow.
+This example uses python 3.10.8 but curl or any other language that can submit a request is possible. 
+
+
+### Example
+
+After a successful login, you need to copy your access token and provide it to the request.
+
+   ```python
+      import os
+      import requests
+      import json
+      import yaml
+      import pprint
+
+      pp = pprint.PrettyPrinter(indent=2)
+
+      WES_URL="https://weskit.bihealth.org"
+        
+      # provide your access token here
+      admin_token={"access_token":"XXX"}
+      header=dict(Authorization="Bearer " + admin_token["access_token"])
+
+      # 1.) Get service info
+      info = requests.get("{}/ga4gh/wes/v1/service-info".format(WES_URL))
+      pp.pprint(info.json())
+
+      # read workflow params
+      with open("tests/workflows/wf1/config.yaml") as file:
+          workflow_params = json.dumps(yaml.load(file, Loader=yaml.FullLoader))
+
+      # create data object for request
+      data = {
+      "workflow_params": workflow_params,
+      "workflow_type": "SMK",
+      "workflow_type_version": "6.10.0",
+      "workflow_url": "wf1/Snakefile"
+      }
+
+      # 2.) Send request to server
+      response = requests.post("{}/ga4gh/wes/v1/runs".format(WES_URL), data=data,  headers=header)
+      response.json()
+
+      # 3.) Get information about single run
+      results = requests.get("{}/ga4gh/wes/v1/runs/{}".format(WES_URL, response.json()["run_id"]), 
+                              verify=verify, headers=header)
+      pp.pprint(results.json())
+
+      # 4.) Finally, lets get all runs
+      info = requests.get("{}/ga4gh/wes/v1/runs".format(WES_URL),  headers=header)
+      pp.pprint(info.json())
+   ```
+
