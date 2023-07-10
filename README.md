@@ -159,7 +159,7 @@ This example uses python 3.10.8 but curl or any other language that can submit a
 
       # 3.) Get information about single run
       results = requests.get("{}/ga4gh/wes/v1/runs/{}".format(WES_URL, response.json()["run_id"]), 
-                              verify=verify, headers=header)
+                              verify=False, headers=header)
       pp.pprint(results.json())
 
       # 4.) Finally, lets get all runs
