@@ -108,10 +108,10 @@ The processed workflow data will be stored within the `tests/data` folder.
 
 ## Additional services
 
-The demo stack can also be deployed together with a Keycloak service for authorization and a MinIO service to provide S3 access to the demo data.
+The demo stack can also be deployed together with a Keycloak service for authorization.
 
 ```bash
-python weskit_stack.py start --login --minio
+python weskit_stack.py start --login
 python weskit_stack.py test --login
 ```
 
@@ -120,9 +120,7 @@ The following describes the submission of a workflow.
 This example uses python 3.10.8 but curl or any other language that can submit a request is possible. 
 
 
-### Example
-
-After a successful login, you need to copy your access token and provide it to the request.
+### Example 1
 
    ```python
       import os
@@ -169,3 +167,49 @@ After a successful login, you need to copy your access token and provide it to t
       pp.pprint(info.json())
    ```
 
+
+### Example 2
+
+   ```python
+      import os
+      import requests
+      import json
+      import yaml
+      import pprint
+      
+      pp = pprint.PrettyPrinter(indent=2)
+      
+      
+      keycloak_host = "http://localhost:8080/auth/realms/WESkit/protocol/openid-connect/token"
+      credentials = dict(username="test",
+                        password="test",
+                        client_id="OTP",
+                        client_secret="7670fd00-9318-44c2-bda3-1a1d2743492d",
+                        grant_type="password")
+      token = requests.post(url=keycloak_host, data=credentials, verify=False).json()
+      header = dict(Authorization="Bearer " + token["access_token"])
+
+      # same procedure as before
+   ```
+### Example 3 (curl)
+   ```bash
+     run_id=$(curl \
+       --ipv4 \
+       --cacert /home/valentin/weskit/deployment/certs/weskit.crt \
+       -X POST  https://localhost.bihealth.org:443/ga4gh/wes/v1/runs \
+       --header 'Content-Type: multipart/form-data' \
+       --header 'Accept: application/json' \
+       -F workflow_params='{
+        "input": "/data/test-input/run1_gerald_D1VCPACXX_1_R1.sorted.fastq.tar.bz2,/data/test-input/run1_gerald_D1VCPACXX_1_R1.sorted.fastq.gz",
+        "outputDir": "/weskit/workflows/nf-seq-qc/res" }' \
+       -F workflow_type="NFL" \
+       -F workflow_engine_parameters='{"engine-environment": "/weskit/workflows/nf-seq-qc/environment.sh"}' \
+       -F workflow_type_version="22.10.0" \
+       -F workflow_url="nf-seq-qc/main.nf" \
+        | jq -r .run_id)
+
+  
+curl --ipv4 --cacert /home/valentin/weskit/deployment/certs/weskit.crt https://localhost.bihealth.org:443/ga4gh/wes/v1/runs
+curl --ipv4 --cacert /home/valentin/weskit/deployment/certs/weskit.crt https://localhost.bihealth.org:443/ga4gh/wes/v1/runs/09afe5ea-2866-4ba3-8c72-049629348388
+
+   ```
