@@ -234,23 +234,20 @@ This example uses python 3.10.8 but curl or any other language that can submit a
    ```
 ### Example 3 (curl)
    ```bash
-     run_id=$(curl \
-       --ipv4 \
-       --cacert /home/valentin/weskit/deployment/certs/weskit.crt \
-       -X POST  https://localhost.bihealth.org:443/ga4gh/wes/v1/runs \
-       --header 'Content-Type: multipart/form-data' \
-       --header 'Accept: application/json' \
-       -F workflow_params='{
-        "input": "/data/test-input/run1_gerald_D1VCPACXX_1_R1.sorted.fastq.tar.bz2,/data/test-input/run1_gerald_D1VCPACXX_1_R1.sorted.fastq.gz",
-        "outputDir": "/weskit/workflows/nf-seq-qc/res" }' \
-       -F workflow_type="NFL" \
-       -F workflow_engine_parameters='{"engine-environment": "/weskit/workflows/nf-seq-qc/environment.sh"}' \
-       -F workflow_type_version="22.10.0" \
-       -F workflow_url="nf-seq-qc/main.nf" \
-        | jq -r .run_id)
-
+     
+run_id=$(curl \
+ --ipv4 \
+ --cacert /home/valentin/weskit/deployment/certs/weskit.crt \
+ --request POST\
+ --header 'Content-Type: multipart/form-data' \
+ --header 'Accept: application/json' \
+ -F workflow_params='{"text": "hello world"}' \
+ -F workflow_type="SMK" \
+ -F workflow_type_version="6.10.0" \
+ -F workflow_url="tests/workflows/wf1/Snakefile" \
+ "https://localhost/ga4gh/wes/v1/runs" \
+  | jq -r .run_id)
+echo $run_id
   
-curl --ipv4 --cacert /home/valentin/weskit/deployment/certs/weskit.crt https://localhost.bihealth.org:443/ga4gh/wes/v1/runs
-curl --ipv4 --cacert /home/valentin/weskit/deployment/certs/weskit.crt https://localhost.bihealth.org:443/ga4gh/wes/v1/runs/09afe5ea-2866-4ba3-8c72-049629348388
-
+curl --ipv4 --cacert /home/valentin/weskit/deployment/certs/weskit.crt https://localhost/ga4gh/wes/v1/runs/$run_id
    ```
