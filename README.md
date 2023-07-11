@@ -170,6 +170,9 @@ This example uses python 3.10.8 but curl or any other language that can submit a
 
 ### Example 2
 
+    wget https://github.com/snakemake/snakemake-tutorial-data/archive/v5.24.1.tar.gz
+    tar --wildcards -xf v5.24.1.tar.gz --strip 1 "*/data" "*/environment.yaml"
+    
    ```python
       import os
       import requests
@@ -179,17 +182,55 @@ This example uses python 3.10.8 but curl or any other language that can submit a
       
       pp = pprint.PrettyPrinter(indent=2)
       
+      WES_URL="https://localhost"
       
       keycloak_host = "http://localhost:8080/auth/realms/WESkit/protocol/openid-connect/token"
       credentials = dict(username="test",
-                        password="test",
-                        client_id="OTP",
-                        client_secret="7670fd00-9318-44c2-bda3-1a1d2743492d",
-                        grant_type="password")
+                          password="test",
+                          client_id="OTP",
+                          client_secret="7670fd00-9318-44c2-bda3-1a1d2743492d",
+                          grant_type="password")
       token = requests.post(url=keycloak_host, data=credentials, verify=False).json()
       header = dict(Authorization="Bearer " + token["access_token"])
+      
+      # 1.) Get service info
+      info = requests.get("{}/ga4gh/wes/v1/service-info".format(WES_URL), verify=False)
+      pp.pprint(info.json())
+      
+      # 2.) Send a workflow to the WES server. 
+      with open("config.yaml") as file:
+        workflow_params = json.dumps(yaml.load(file, Loader=yaml.FullLoader))
+      
+      
+      ## create data object for request
+      data = {
+        "workflow_params": workflow_params,
+        "workflow_type": "SMK",
+        "workflow_type_version": "6.10.0",
+        "workflow_url": "Snakefile"
+      }
+      
+      ## attach workflow files
+      files = [
+        ("workflow_attachment", ("Snakefile", open("Snakefile", "rb"))),
+        ("workflow_attachment", ("bwa_samtools_bcftools.yaml", open("bwa_samtools_bcftools.yaml", "rb"))),
+        ("workflow_attachment", ("py_plot.yaml", open("py_plot.yaml", "rb"))),
+        ("workflow_attachment", ("plot-quals.py", open("plot-quals.py", "rb")))
+      ]
+      
+      ## send request to server
+      response = requests.post("{}/ga4gh/wes/v1/runs".format(WES_URL), data=data, files=files, verify=False, headers=header)
+      response.json()
+      
+      
+      ## get information about single run
+      results = requests.get("{}/ga4gh/wes/v1/runs/{}".format(WES_URL, response.json()["run_id"]), verify=False, headers=header)
+      pp.pprint(results.json())
+      
+      # 3.) Finally, lets get all runs
+      info = requests.get("{}/ga4gh/wes/v1/runs".format(WES_URL), verify=False, headers=header)
+      pp.pprint(info.json())
 
-      # same procedure as before
    ```
 ### Example 3 (curl)
    ```bash
