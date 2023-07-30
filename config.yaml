@@ -1,5 +1,0 @@
-genome: "/data/reference/genome.fa"
-samples:
-  A: "/data/protected/samples/A.fastq"
-  B: "/data/protected/samples/B.fastq"
-  C: "/data/protected/samples/C.fastq"
