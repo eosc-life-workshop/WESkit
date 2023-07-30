@@ -1,0 +1,28 @@
+rule all:
+    input:
+        "sorted_reads/A.bam.bai"
+
+rule bwa_map:
+    input:
+        genome="/data/data/genome.fa",
+        reads="/data/data/samples/{sample}.fastq"
+    output:
+        alignment="mapped_reads/{sample}.bam"
+    shell:
+        "bwa mem {input.genome} {input.reads} | samtools view -Sb - > {output.alignment}"
+
+rule samtools_sort:
+    input:
+        bam="mapped_reads/{sample}.bam"
+    output:
+        bam="sorted_reads/{sample}.bam"
+    shell:
+        "samtools sort -T sorted_reads/{wildcards.sample} -O bam {input.bam} > {output.bam}"
+
+rule samtools_index:
+    input:
+        bam="sorted_reads/{sample}.bam"
+    output:
+        bai="sorted_reads/{sample}.bam.bai"
+    shell:
+        "samtools index {input.bam}"

@@ -1,0 +1,14 @@
+name: workshop_env
+channels:
+    - bioconda
+    - conda-forge
+dependencies:
+    - snakemake-minimal =7.30.2
+    - python=3.11.4=hab00c5b_0_cpython
+    - jinja2 >=3.0,<4.0
+    - networkx
+    - matplotlib
+    - graphviz
+    - bcftools
+    - samtools
+    - bwa =0.7
