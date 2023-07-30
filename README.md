@@ -122,59 +122,29 @@ This example uses python 3.10.8 but curl or any other language that can submit a
 
 ### Example 1
 
-   ```python
-      import os
-      import requests
-      import json
-      import yaml
-      import pprint
-
-      pp = pprint.PrettyPrinter(indent=2)
-
-      WES_URL="https://weskit.bihealth.org"
-        
-      # provide your access token here
-      admin_token={"access_token":"XXX"}
-      header=dict(Authorization="Bearer " + admin_token["access_token"])
-
-      # 1.) Get service info
-      info = requests.get("{}/ga4gh/wes/v1/service-info".format(WES_URL))
-      pp.pprint(info.json())
-
-      # read workflow params
-      with open("tests/workflows/wf1/config.yaml") as file:
-          workflow_params = json.dumps(yaml.load(file, Loader=yaml.FullLoader))
-
-      # create data object for request
-      data = {
-      "workflow_params": workflow_params,
-      "workflow_type": "SMK",
-      "workflow_type_version": "6.10.0",
-      "workflow_url": "wf1/Snakefile"
-      }
-
-      # 2.) Send request to server
-      response = requests.post("{}/ga4gh/wes/v1/runs".format(WES_URL), data=data,  headers=header)
-      response.json()
-
-      # 3.) Get information about single run
-      results = requests.get("{}/ga4gh/wes/v1/runs/{}".format(WES_URL, response.json()["run_id"]), 
-                              verify=False, headers=header)
-      pp.pprint(results.json())
-
-      # 4.) Finally, lets get all runs
-      info = requests.get("{}/ga4gh/wes/v1/runs".format(WES_URL),  headers=header)
-      pp.pprint(info.json())
+   ```run_id=$(curl \
+      --ipv4 \
+      --cacert /home/ubuntu/weskit/deployment/certs/weskit.crt \
+      --request POST\
+      --header 'Content-Type: multipart/form-data' \
+      --header 'Accept: application/json' \
+      -F workflow_params='{"text": "hello world"}' \
+      -F workflow_type="SMK" \
+      -F workflow_type_version="6.10.0" \
+      -F workflow_url="tests/workflows/wf1/Snakefile" \
+      "https://localhost/ga4gh/wes/v1/runs" \
+      | jq -r .run_id)
+      echo $run_id
+      
+      curl --ipv4 --cacert  ~/weskit/deployment/certs/weskit.crt -X GET  https://localhost:443/ga4gh/wes/v1/service-info --header 'Content-Type: multipart/form-data' --header 'Accept: application/json'
+      
+      curl --ipv4 --cacert /home/ubuntu/weskit/deployment/certs/weskit.crt https://localhost/ga4gh/wes/v1/runs/$run_id
    ```
 
 
 ### Example 2
-
-    wget https://github.com/snakemake/snakemake-tutorial-data/archive/v5.24.1.tar.gz
-    tar --wildcards -xf v5.24.1.tar.gz --strip 1 "*/data" "*/environment.yaml"
-    
-   ```python
-      import os
+ 
+   ```import os
       import requests
       import json
       import yaml
@@ -182,72 +152,102 @@ This example uses python 3.10.8 but curl or any other language that can submit a
       
       pp = pprint.PrettyPrinter(indent=2)
       
-      WES_URL="https://localhost"
-      
-      keycloak_host = "http://localhost:8080/auth/realms/WESkit/protocol/openid-connect/token"
-      credentials = dict(username="test",
-                          password="test",
-                          client_id="OTP",
-                          client_secret="7670fd00-9318-44c2-bda3-1a1d2743492d",
-                          grant_type="password")
-      token = requests.post(url=keycloak_host, data=credentials, verify=False).json()
-      header = dict(Authorization="Bearer " + token["access_token"])
+      WES_URL="https://weskit.bihealth.org"
+           
+      # provide your access token here
+      admin_token={"access_token":"XXX"}
+      header=dict(Authorization="Bearer " + admin_token["access_token"])
       
       # 1.) Get service info
-      info = requests.get("{}/ga4gh/wes/v1/service-info".format(WES_URL), verify=False)
+      info = requests.get("{}/ga4gh/wes/v1/service-info".format(WES_URL))
       pp.pprint(info.json())
       
-      # 2.) Send a workflow to the WES server. 
-      with open("config.yaml") as file:
-        workflow_params = json.dumps(yaml.load(file, Loader=yaml.FullLoader))
+         # read workflow params
+      with open("tests/workflows/wf1/config.yaml") as file:
+         workflow_params = json.dumps(yaml.load(file, Loader=yaml.FullLoader))
       
-      
-      ## create data object for request
+      # create data object for request
       data = {
-        "workflow_params": workflow_params,
-        "workflow_type": "SMK",
-        "workflow_type_version": "6.10.0",
-        "workflow_url": "Snakefile"
+         "workflow_params": workflow_params,
+         "workflow_type": "SMK",
+         "workflow_type_version": "6.10.0",
+         "workflow_url": "wf1/Snakefile"
       }
       
-      ## attach workflow files
-      files = [
-        ("workflow_attachment", ("Snakefile", open("Snakefile", "rb"))),
-        ("workflow_attachment", ("bwa_samtools_bcftools.yaml", open("bwa_samtools_bcftools.yaml", "rb"))),
-        ("workflow_attachment", ("py_plot.yaml", open("py_plot.yaml", "rb"))),
-        ("workflow_attachment", ("plot-quals.py", open("plot-quals.py", "rb")))
-      ]
-      
-      ## send request to server
-      response = requests.post("{}/ga4gh/wes/v1/runs".format(WES_URL), data=data, files=files, verify=False, headers=header)
+      # 2.) Send request to server
+      response = requests.post("{}/ga4gh/wes/v1/runs".format(WES_URL), data=data,  headers=header)
       response.json()
+      # 3.) Get information about single run
+      results = requests.get("{}/ga4gh/wes/v1/runs/{}".format(WES_URL, response.json()["run_id"]), 
+                                 verify=False, headers=header)
+       pp.pprint(results.json())
       
-      
-      ## get information about single run
-      results = requests.get("{}/ga4gh/wes/v1/runs/{}".format(WES_URL, response.json()["run_id"]), verify=False, headers=header)
-      pp.pprint(results.json())
-      
-      # 3.) Finally, lets get all runs
-      info = requests.get("{}/ga4gh/wes/v1/runs".format(WES_URL), verify=False, headers=header)
+      # 4.) Finally, lets get all runs
+      info = requests.get("{}/ga4gh/wes/v1/runs".format(WES_URL),  headers=header)
       pp.pprint(info.json())
-
    ```
 ### Example 3 (curl)
+wget https://github.com/snakemake/snakemake-tutorial-data/archive/v5.24.1.tar.gz
+tar --wildcards -xf v5.24.1.tar.gz --strip 1 "*/data" "*/environment.yaml"
+
+wget https://gitlab.com/twardzso/3rd_denbi_user_meeting__snakemake_cloud/-/raw/master/2_snakemake/Snakefile
+wget https://gitlab.com/twardzso/3rd_denbi_user_meeting__snakemake_cloud/-/raw/master/2_snakemake/scripts/plot-quals.py
+wget https://gitlab.com/twardzso/3rd_denbi_user_meeting__snakemake_cloud/-/raw/master/3_cloud/envs/bwa_samtools_bcftools.yaml
+wget https://gitlab.com/twardzso/3rd_denbi_user_meeting__snakemake_cloud/-/raw/master/3_cloud/envs/py_plot.yaml
+
+
    ```bash
-     
-run_id=$(curl \
- --ipv4 \
- --cacert /home/valentin/weskit/deployment/certs/weskit.crt \
- --request POST\
- --header 'Content-Type: multipart/form-data' \
- --header 'Accept: application/json' \
- -F workflow_params='{"text": "hello world"}' \
- -F workflow_type="SMK" \
- -F workflow_type_version="6.10.0" \
- -F workflow_url="tests/workflows/wf1/Snakefile" \
- "https://localhost/ga4gh/wes/v1/runs" \
-  | jq -r .run_id)
-echo $run_id
-  
-curl --ipv4 --cacert /home/valentin/weskit/deployment/certs/weskit.crt https://localhost/ga4gh/wes/v1/runs/$run_id
-   ```
+   import os
+    import requests
+    import json
+    import yaml
+    import pprint
+       
+    pp = pprint.PrettyPrinter(indent=2)
+       
+    WES_URL="https://localhost"
+       
+    keycloak_host = "http://localhost:8080/auth/realms/WESkit/protocol/openid-connect/token"
+    credentials = dict(username="test",
+                           password="test",
+                           client_id="OTP",
+                           client_secret="7670fd00-9318-44c2-bda3-1a1d2743492d",
+                           grant_type="password")
+    token = requests.post(url=keycloak_host, data=credentials, verify=False).json()
+    header = dict(Authorization="Bearer " + token["access_token"])
+       
+    # 1.) Get service info
+    info = requests.get("{}/ga4gh/wes/v1/service-info".format(WES_URL), verify=False)
+    pp.pprint(info.json())
+       
+       
+    ## create data object for request
+    data = {
+         "workflow_params":'{}',
+         "workflow_engine_parameters": '{"use-conda":"T", "engine-environment":"/weskit/workflows/workshop_wf/environment.sh"}',
+         "workflow_type": "SMK",
+         "workflow_type_version": "6.10.0",
+         "workflow_url": "workshop_wf/Snakefile"
+    }
+       
+     ## attach workflow files
+    files = [
+         ("workflow_attachment", ("Snakefile", open("../workflows/workshop_wf/Snakefile", "rb"))),
+         ("workflow_attachment", ("bwa_samtools_bcftools.yaml", open("data/bwa_samtools_bcftools.yaml", "rb"))),
+         ("workflow_attachment", ("py_plot.yaml", open("data/py_plot.yaml", "rb"))),
+         ("workflow_attachment", ("plot-quals.py", open("scripts/plot-quals.py", "rb")))
+       ]
+       
+    ## send request to server
+    response = requests.post("{}/ga4gh/wes/v1/runs".format(WES_URL), data=data, files=files, verify=False, headers=header)
+    response.json()
+       
+       
+    ## get information about single run
+    results = requests.get("{}/ga4gh/wes/v1/runs/{}".format(WES_URL, response.json()["run_id"]), verify=False, headers=header)
+    pp.pprint(results.json())
+       
+    # 3.) Finally, lets get all runs
+    info = requests.get("{}/ga4gh/wes/v1/runs".format(WES_URL), verify=False, headers=header)
+    pp.pprint(info.json())
+    ```
