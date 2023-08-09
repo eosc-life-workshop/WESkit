@@ -7,7 +7,7 @@ Participants will be encouraged to set up their own WESkit instance and use it t
 
 ## Step 1: Install docker
 
-* install docker
+install docker
 
 ```console
 sudo apt-get update
@@ -16,7 +16,7 @@ sudo usermod -aG docker ubuntu
 ```
 ### Step 2: Setup docker  network and swarm
 
-* Before swarm initialization, gwbridge network needs to be removed and re-created
+Before swarm initialization, gwbridge network needs to be removed and re-created
 
 This option can be directly used to change the MTU accordingly to your network MTU
 
@@ -30,7 +30,7 @@ docker network create -d bridge \
   docker_gwbridge
 ```
 
-* initiate swarm
+initiate swarm
 
 ```console
 docker swarm init
@@ -48,7 +48,7 @@ conda install -c conda-forge mamba
 
 ## Step 4:  Setup of the deployment environment
 
-* Clone the deployment repository and install the deployment environment, which contains just a few required python packages.
+Clone the deployment repository and install the deployment environment, which contains just a few required python packages.
 ```bash
 git clone https://gitlab.com/one-touch-pipeline/weskit/deployment
 cd deployment
@@ -56,14 +56,14 @@ mamba env create -n weskit_deployment -f environment.yaml
 conda activate weskit_deployment
 ```
 
-* Running the WESkit demo deployment mounts the `test/data` folder from the repository into the WESkit container.
+Running the WESkit demo deployment mounts the `test/data` folder from the repository into the WESkit container.
 All results will be written into this folder by a non-root user. Therefore, we need to set write access for this folder to 777.
 
 ```bash
 chmod 777 tests/data
 ```
 
-* The pre-configured WESkit rest server and other components require certificates for secure communication.
+The pre-configured WESkit rest server and other components require certificates for secure communication.
 The repository contains a script `generateDevelopmentCerts.sh` to create respective certificates which will be stored at `certs/`. The certificates will then be integrated as secrets into the container.
 
 ```bash
@@ -72,7 +72,7 @@ The repository contains a script `generateDevelopmentCerts.sh` to create respect
 
 ### Step 5: Start Weskit
 
-4. Now start the stack using the python script:
+Now start the stack using the python script:
 
 ```bash
 python weskit_stack.py start
@@ -82,7 +82,7 @@ This command will start the services in your Docker swarm.
 
 ## Step 6: API demo
 
-5. Once the stack is running (~1min), you can execute a demo script that submits a Snakemake workflow to WESkit.
+Once the stack is running (~1min), you can execute a demo script that submits a Snakemake workflow to WESkit.
 Per default, the service and the dashboard will be available at ["https://localhost"]("https://localhost"). It might be necessary to resolve localhost manually to 127.0.0.1 .
 
 ```bash
@@ -204,7 +204,6 @@ wget https://github.com/snakemake/snakemake-tutorial-data/archive/v5.24.1.tar.gz
 tar --wildcards -xf v5.24.1.tar.gz --strip 1 "*/data" "*/environment.yaml"
 ```
 
-###Snakefile
 ```
 https://github.com/eosc-life-workshop/WESkit.git
 
