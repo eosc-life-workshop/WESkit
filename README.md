@@ -266,3 +266,37 @@ pp.pprint(results.json())
 info = requests.get("{}/ga4gh/wes/v1/runs".format(WES_URL), verify=False, headers=header)
 pp.pprint(info.json())
 ```
+## Step 12: Remote compute infrastructure configuration
+
+Depending on the desired setup weskit_config/config{_login}.yaml may require some adjustments, such the configuration of the remote compute infrastructure
+
+Note that there are six executors which define where the workflow engine is executed: 
+"ssh", "ssh_lsf", "ssh_slurm", "local", "local_lsf", and "local_slurm".
+For this examle we assume a cluster with a SLURM scheduling system.
+
+The remote folders need to be mounted into you local machine with e.g. sshfs
+```
+executor:
+  type: "ssh_slurm"
+  remote_data_dir: "/home/user/path/to/remote/data_dir"
+  remote_workflows_dir: "/home/user/path/to/remote/workflows_dir"
+  login:
+    username: "user"
+    hostname: "slurm_cluster"
+    port: 22
+    knownhosts_file: "~/.ssh/known_hosts"
+    keyfile: "~/.ssh/weskit_cluster_test_rsa"
+    keyfile_passphrase: ""
+
+```
+
+Depending on the desired workflow engine parameters, some need activation within the config file.
+e.g. activation of a conda environment:
+
+```
+  - name: "use-conda"
+    api: true
+    type: "bool"
+    value: "true"
+```
+
