@@ -355,7 +355,8 @@ sudo ufw deny in from $clusterIP to  $internalGatewayIP proto tcp
 sudo ufw allow in from $clusterIP to $internalGatewayIP port 38069 proto tcp 
 
 ###
-minikube start  --mount=true   --mount-port=38069  --mount-string="/home/$USER/localVolumes/:/localVolumes" --driver docker  --network my-minikube-network  --static-ip 192.168.60.2
+docker network create --driver=bridge --subnet=192.168.60.0/24 --gateway=192.168.60.1 -o --ip-masq -o --icc -o com.docker.network.driver.mtu=1442 --label=created_by.minikube.sigs.k8s.io=true --label=name.minikube.sigs.k8s.io=minikube minikube
+minikube start --mount=true   --mount-port=38069  --mount-string="/home/$USER/localVolumes/:/localVolumes" --driver docker  --network minikube --static-ip 192.168.60.2
 
 minikube ssh  ls /localVolumes/api
 
@@ -375,8 +376,7 @@ helm dependencies update
 cp example-values.yaml your-values.yaml
 helm install -f your-values.yaml weskit-devel-1 ./
 
-
-
+curl --ipv4 https://192.168.60.2:30132/ga4gh/wes/v1/service-info --cacert /home/$USER/weskit/helm-deployment/certs/weskit.crt
 ```
 
 
