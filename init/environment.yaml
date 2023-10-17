@@ -1,0 +1,16 @@
+name: snakemake_training
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+    - bcftools=1.18=h8b25389_0
+    - boto3=1.28.64=pyhd8ed1ab_0
+    - bwa=0.7.17=he4a0461_11
+    - graphviz=8.1.0=h28d9a01_0
+    - jinja2=3.1.2=pyhd8ed1ab_1
+    - matplotlib=3.8.0=py310hff52083_2
+    - networkx=3.1=pyhd8ed1ab_0
+    - pysam=0.21.0=py310h41dec4a_1
+    - samtools=1.18=h50ea8bc_1
+    - snakemake-minimal=7.32.4=pyhdfd78af_1
