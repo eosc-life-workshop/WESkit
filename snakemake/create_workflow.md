@@ -72,7 +72,7 @@ snakemake --snakefile Snakemake --cores 1 mapped_reads/A.bam mapped_reads/B.bam
 snakemake --snakefile Snakemake --cores 1 mapped_reads/{A,B}.bam
 ```
 
-6. and create an alignment index file:
+6. Create an alignment index file:
 
 ```python
 rule samtools_index:
@@ -109,8 +109,6 @@ rule bcftools_call:
 snakemake --snakefile Snakemake --cores 1 calls/all.vcf
 ```
 
-
-
 8. Apply a custom script to visualize the results:
 
 ```python
@@ -126,7 +124,6 @@ rule plot_quals:
 snakemake --snakefile Snakemake --cores 1 plots/quals.svg
 ```
 
-
 9. Adding a target rule: Snakemake also accepts rule names as targets 
 
 ```python
@@ -134,8 +131,8 @@ rule all:
     input:
         "plots/quals.svg"
 ```
-```
+
 ```bash
 snakemake --snakefile Snakemake --cores 1 all
 ```
-```
+
