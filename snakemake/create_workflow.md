@@ -19,18 +19,18 @@ tar --wildcards -xf v7.4.3.tar.gz --strip 1 "*/data"
 ```python
 rule bwa_map:
     input:
-        "data/genome.fa",
-        "data/samples/A.fastq"
+        genome="data/genome.fa",
+        reads="data/samples/A.fastq"
     output:
-        "mapped_reads/A.bam"
+        alignment="mapped_reads/A.bam"
     shell:
-        "bwa mem {input} | samtools view -Sb - > {output}"
+        "bwa mem {input.genome} {input.reads} | samtools view -Sb - > {output.alignment}"
 ```
 
 2. We create a Snakefile (workflow file) and copy the code into it. Run the workflow with:
 
 ```bash
-snakemake --snakefile Snakemake --cores 1 mapped_reads/A.bam
+snakemake --snakefile Snakefile --cores 1 mapped_reads/A.bam
 ```
 
 3. The previous rule only works for one sample. 
@@ -39,19 +39,19 @@ snakemake --snakefile Snakemake --cores 1 mapped_reads/A.bam
 ```python
 rule bwa_map:
     input:
-        "data/genome.fa",
-        "data/samples/{sample}.fastq"
+        genome="data/genome.fa",
+        reads="data/samples/{sample}.fastq"
     output:
-        "mapped_reads/{sample}.bam"
+        alignment="mapped_reads/{sample}.bam"
     shell:
-        "bwa mem {input} | samtools view -Sb - > {output}"
+        "bwa mem {input.genome} {input.reads} | samtools view -Sb - > {output.alignment}"
 ```
 
 4. Run updated workflow:
 
 ```bash
-snakemake --snakefile Snakemake --cores 1 mapped_reads/A.bam mapped_reads/B.bam
-snakemake --snakefile Snakemake --cores 1 mapped_reads/{A,B}.bam
+snakemake --snakefile Snakefile --cores 1 mapped_reads/A.bam mapped_reads/B.bam
+snakemake --snakefile Snakefile --cores 1 mapped_reads/{A,B}.bam
 ```
 
 5. Sorting read alignments using samtools:
@@ -59,17 +59,17 @@ snakemake --snakefile Snakemake --cores 1 mapped_reads/{A,B}.bam
 ```python
 rule samtools_sort:
     input:
-        "mapped_reads/{sample}.bam"
+        bam="mapped_reads/{sample}.bam"
     output:
-        "sorted_reads/{sample}.bam"
+        bam="sorted_reads/{sample}.bam"
     shell:
         "samtools sort -T sorted_reads/{wildcards.sample} "
-        "-O bam {input} > {output}"
+        "-O bam {input.bam} > {output.bam}"
 ```
 
 ```bash
-snakemake --snakefile Snakemake --cores 1 mapped_reads/A.bam mapped_reads/B.bam
-snakemake --snakefile Snakemake --cores 1 mapped_reads/{A,B}.bam
+snakemake --snakefile Snakefile --cores 1 mapped_reads/A.bam mapped_reads/B.bam
+snakemake --snakefile Snakefile --cores 1 mapped_reads/{A,B}.bam
 ```
 
 6. Create an alignment index file:
@@ -85,7 +85,7 @@ rule samtools_index:
 ```
 
 ```bash
-snakemake --snakefile Snakemake --cores 1 sorted_reads/{A,B}.bam
+snakemake --snakefile Snakefile --cores 1 sorted_reads/{A,B}.bam
 ```
 
 7. Calling genomic variants:
@@ -99,14 +99,14 @@ rule bcftools_call:
         bams=expand("sorted_reads/{sample}.bam", sample=SAMPLES),
         bais=expand("sorted_reads/{sample}.bam.bai", sample=SAMPLES)
     output:
-        "calls/all.vcf"
+        vcf="calls/all.vcf"
     shell:
         "samtools mpileup -g -f {input.fa} {input.bams} | "
-        "bcftools call -mv - > {output}"
+        "bcftools call -mv - > {output.vcf}"
 ```
 
 ```bash
-snakemake --snakefile Snakemake --cores 1 calls/all.vcf
+snakemake --snakefile Snakefile --cores 1 calls/all.vcf
 ```
 
 8. Apply a custom script to visualize the results:
@@ -114,14 +114,14 @@ snakemake --snakefile Snakemake --cores 1 calls/all.vcf
 ```python
 rule plot_quals:
     input:
-        "calls/all.vcf"
+        vcf="calls/all.vcf"
     output:
-        "plots/quals.svg"
+        svg="plots/quals.svg"
     script:
         "scripts/plot-quals.py"
 ```
 ```bash
-snakemake --snakefile Snakemake --cores 1 plots/quals.svg
+snakemake --snakefile Snakefile --cores 1 plots/quals.svg
 ```
 
 9. Adding a target rule: Snakemake also accepts rule names as targets 
@@ -133,7 +133,7 @@ rule all:
 ```
 
 ```bash
-snakemake --snakefile Snakemake --cores 1 all
+snakemake --snakefile Snakefile --cores 1 all
 ```
 
 10. The final Snakefile should look like this
@@ -147,20 +147,20 @@ rule all:
 
 rule bwa_map:
     input:
-        "data/genome.fa",
-        "data/samples/{sample}.fastq"
+        genome="data/genome.fa",
+        reads="data/samples/{sample}.fastq"
     output:
-        "mapped_reads/{sample}.bam"
+        alignment="mapped_reads/{sample}.bam"
     shell:
-        "bwa mem {input} | samtools view -Sb - > {output}"
+        "bwa mem {input.genome} {input.reads} | samtools view -Sb - > {output.alignment}"
 
 rule samtools_sort:
     input:
-        "mapped_reads/{sample}.bam"
+        bam="mapped_reads/{sample}.bam"
     output:
-        "sorted_reads/{sample}.bam"
+        bam="sorted_reads/{sample}.bam"
     shell:
-        "samtools sort -T sorted_reads/{wildcards.sample} -O bam {input} > {output}"
+        "samtools sort -T sorted_reads/{wildcards.sample} -O bam {input.bam} > {output.bam}"
 
 rule samtools_index:
     input:
@@ -176,16 +176,16 @@ rule bcftools_call:
         bam=expand("sorted_reads/{sample}.bam", sample=SAMPLES),
         bai=expand("sorted_reads/{sample}.bam.bai", sample=SAMPLES)
     output:
-        "calls/all.vcf"
+        vcf="calls/all.vcf"
     shell:
         "bcftools mpileup -f {input.fa} {input.bam} | "
-        "bcftools call -mv - > {output}"
+        "bcftools call -mv - > {output.vcf}"
 
 rule plot_quals:
     input:
-        "calls/all.vcf"
+        vcf="calls/all.vcf"
     output:
-        "plots/quals.svg"
+        svg="plots/quals.svg"
     script:
         "scripts/plot-quals.py"
 ```
