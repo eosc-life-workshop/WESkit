@@ -58,7 +58,7 @@ Connect to instance via ssh
 
 ```bash
 cd 
-git clone https://github.com/eosc-life-workshop/WESkit.git
+git clone https://github.com/eosc-life-workshop/deNBI_workshop.git
 ```
 
 2. Download and install conda
@@ -67,12 +67,14 @@ git clone https://github.com/eosc-life-workshop/WESkit.git
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 /bin/bash Miniconda3-latest-Linux-x86_64.sh
 /bin/bash
+conda install -c conda-forge mamba
 ```
 
 3. Install conda environment
 
 ```bash
-cd 
+cd deNBI_workshop/init
 mamba env create --file environment.yaml
 conda activate snakemake_training
+cd ../snakemake/
 ```
