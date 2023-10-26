@@ -7,9 +7,7 @@
 
 ```bash
 conda activate snakemake_training
-cd $HOME/3rd_denbi_user_meeting__snakemake_cloud/2_snakemake
-wget wget https://github.com/snakemake/snakemake-tutorial-data/archive/refs/tags/v7.4.3.tar.gz
-tar --wildcards -xf v7.4.3.tar.gz --strip 1 "*/data"
+touch Snakefile
 ```
 
 ##  A simple workflow 
@@ -101,7 +99,7 @@ rule bcftools_call:
     output:
         vcf="calls/all.vcf"
     shell:
-        "samtools mpileup -g -f {input.fa} {input.bams} | "
+        "samtools mpileup -f {input.fa} {input.bams} | "
         "bcftools call -mv - > {output.vcf}"
 ```
 
