@@ -2,8 +2,8 @@
 
 ## Data
 
-1. First, we download tutorial data from the official Snakemake repository - complete tutorial is very recommended for advanced learning!
-  - ignore the environment.yaml file as we already installed it
+1. First, we use the tutorial data from the official Snakemake repository - complete tutorial is very recommended for advanced learning!
+  - ignore the environment.yaml file as it was already installed
 
 ```bash
 conda activate snakemake_training
@@ -83,7 +83,7 @@ rule samtools_index:
 ```
 
 ```bash
-snakemake --snakefile Snakefile --cores 1 sorted_reads/{A,B}.bam
+snakemake --snakefile Snakefile --cores 1 sorted_reads/{A,B}.bam.bai
 ```
 
 7. Calling genomic variants:
@@ -99,7 +99,7 @@ rule bcftools_call:
     output:
         vcf="calls/all.vcf"
     shell:
-        "samtools mpileup -f {input.fa} {input.bams} | "
+        "bcftools mpileup -f {input.fa} {input.bams} | "
         "bcftools call -mv - > {output.vcf}"
 ```
 

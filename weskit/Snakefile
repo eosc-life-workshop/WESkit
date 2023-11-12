@@ -6,8 +6,8 @@ rule all:
 
 rule bwa_map:
     input:
-        genome="data/genome.fa",
-        reads="data/samples/{sample}.fastq"
+        genome="/data/workshop_data/genome.fa",
+        reads="/data/workshop_data/samples/{sample}.fastq"
     output:
         alignment="mapped_reads/{sample}.bam"
     shell:
@@ -19,7 +19,7 @@ rule samtools_sort:
     output:
         bam="sorted_reads/{sample}.bam"
     shell:
-        "samtools sort -T sorted_reads/{wildcards.sample} -O bam {inputbam} > {output.bam}"
+        "samtools sort -T sorted_reads/{wildcards.sample} -O bam {input.bam} > {output.bam}"
 
 rule samtools_index:
     input:
@@ -31,7 +31,7 @@ rule samtools_index:
 
 rule bcftools_call:
     input:
-        fa="data/genome.fa",
+        fa="/data/workshop_data/genome.fa",
         bam=expand("sorted_reads/{sample}.bam", sample=SAMPLES),
         bai=expand("sorted_reads/{sample}.bam.bai", sample=SAMPLES)
     output:
@@ -46,4 +46,4 @@ rule plot_quals:
     output:
         svg="plots/quals.svg"
     script:
-        "scripts/plot-quals.py"
+        "/weskit/workflows/scripts/plot-quals.py"

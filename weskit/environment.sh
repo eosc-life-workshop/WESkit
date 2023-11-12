@@ -1,4 +1,3 @@
 eval "$(conda shell.bash hook)"
-conda activate workshop_env
+conda activate snakemake_training
 
-#mamba env create -n workshop_env -f environment.yaml

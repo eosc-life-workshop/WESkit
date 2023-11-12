@@ -11,57 +11,17 @@
 2. First time users need to add their public ssh key to the horizon dashboard, to be able to inject your public key when you create a new VM:
 Project --> Compute --> Key Pairs --> Import Public Key
 
-3. Create a virtual machine: Project --> Compute --> Instances --> Launch Instance
-
-    - Details: set an **Instance Name with your zoomname** in it
-    - Source: set **Create new volume** to **no** and choose "Ubuntu 22.04 LTS (2023-09-28)" image
-    - Flavor:  **de.NBI default**
-    - Networks: select **CPBielefeld**
-    - Key pair: choose **YOURKEY**
-    - Launch instance
+3. Create a virtual machine using a pre-build snapshot: Project --> Compute --> Instances --> Launch Instance
 
 4. Assign a floating ip to get ssh access: Project --> Compute --> Instances --> choose your instance --> assign floating VM
  
     - Assign floating IP  129.70.51.x
 
-## 2 Connect to instance via ssh
-
-Connection to OpenStack vm at de.NBI cloud site Bielefeld.
-
-**A)** 
-
-1. Connect from your client: 
-
-```bash
-PATH_TO_KEY=/path/to/id_rsa.pub
-ssh yourUserName@129.70.51.x -i PATH_TO_KEY
-```
+## 2 Connect to your personal instance via Theia link 
+## The following point were already executed by the host of the workshop
 
 
-**B)** Setup ssh-config under .ssh/config
-
-  - Windows(C:\Users\user\\.ssh\config) & Linux(~/.ssh/config) :
-
-```bash
-
-Host training_snakemake
-  HostName 129.70.51.x
-  IdentityFile PATH_TO_KEY
-  User ubuntu
-```
-
-## 3. Setup project 
-
-Connect to instance via ssh 
-
-1. Clone this repository
-
-```bash
-cd 
-git clone https://github.com/eosc-life-workshop/deNBI_workshop.git
-```
-
-2. Download and install conda
+1. Download and install conda
 
 ```bash
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
@@ -70,7 +30,7 @@ wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 conda install -c conda-forge mamba
 ```
 
-3. Install conda environment
+2. Install conda environment
 
 ```bash
 cd deNBI_workshop/init
