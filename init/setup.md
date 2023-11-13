@@ -2,23 +2,20 @@
 
 ## 0 Prerequisites
 
-- You need to have a deNBI account to  become a member of our training project at the de.NBI cloud in Bielefeld
-- Your public ssh must be added at the de.NBI portal: https://cloud.denbi.de/portal/ to able to connect.
+- You need a deNBI account to  become a member of our training project at the de.NBI cloud in Bielefeld.
 
 ## 1 Deploy a VM in training project
 
-1. Login with LifeScience Login at de.NBI cloud Bielefeld horizon dashboard (OpenStack graphical interface): https://denbi-cloud.bihealth.org/
-2. First time users need to add their public ssh key to the horizon dashboard, to be able to inject your public key when you create a new VM:
-Project --> Compute --> Key Pairs --> Import Public Key
+1. Login with your LifeScience Login at the de.NBI Portal: https://cloud.denbi.de/portal/webapp/#/userinfo
 
-3. Create a virtual machine using a pre-build snapshot: Project --> Compute --> Instances --> Launch Instance
+2. As a member of the workshop you can start your personal Simple VM instance right away:
+Virtual Machines --> Overviews --> Instances --> Instance Name Contains your first- and surname
 
-4. Assign a floating ip to get ssh access: Project --> Compute --> Instances --> choose your instance --> assign floating VM
- 
-    - Assign floating IP  129.70.51.x
+3. Get the Theia IDE by clicking on following URL https://simplevm.bi.denbi.de/CPBWSW<surname_and_firstname>_100
 
-## 2 Connect to your personal instance via Theia link 
-## The following point were already executed by the host of the workshop
+
+## 2 Within your personal SimpleVM instance
+### The following points were already executed by the host of the workshop
 
 
 1. Download and install conda
