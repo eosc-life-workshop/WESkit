@@ -1,19 +1,22 @@
 # Snakemake & workflow
 
-## Data
+## Environment activation
 
-1. First, we use the tutorial data from the official Snakemake repository - complete tutorial is very recommended for advanced learning!
-  - ignore the environment.yaml file as it was already installed
+First, we use the tutorial data from the official Snakemake repository - complete tutorial is very recommended for advanced learning!
+We will create a Snakefile (workflow file) and copy the rules into it.
 
-```bash
+Please execute the following lines in the terminal
+``` bash
 conda activate snakemake_training
+cd /home/ubuntu/deNBI_workshop/snakemake
 touch Snakefile
 ```
 
 ##  A simple workflow 
 
-1. The first step/rule of the workflow maps reads of a given sample to a given reference genome. We will will use bwa mem to do this.
+1. The first rule of the workflow maps reads of a given sample to a reference genome. For this we will use bwa mem.
 
+Please copy the following rule into the empty Snakefile.
 ```python
 rule bwa_map:
     input:
@@ -25,15 +28,15 @@ rule bwa_map:
         "bwa mem {input.genome} {input.reads} | samtools view -Sb - > {output.alignment}"
 ```
 
-2. We create a Snakefile (workflow file) and copy the code into it. Run the workflow with:
-
+Please execute the workflow using the following command in the terminal:
 ```bash
 snakemake --snakefile Snakefile --cores 1 mapped_reads/A.bam
 ```
 
-3. The previous rule only works for one sample. 
+2. The previous rule mapped only one sample to the reference genome. 
    Snakemake uses wildcards for generalization; here {sample} is used to generalize input reads:
-
+   
+Please replace the previous rule with the following code.
 ```python
 rule bwa_map:
     input:
@@ -45,15 +48,18 @@ rule bwa_map:
         "bwa mem {input.genome} {input.reads} | samtools view -Sb - > {output.alignment}"
 ```
 
-4. Run updated workflow:
+3. Run updated workflow using one of the commands below. 
+   Both commands do the same although the second one uses shell expansion.
 
+Please execute one of the commands in the terminal.
 ```bash
 snakemake --snakefile Snakefile --cores 1 mapped_reads/A.bam mapped_reads/B.bam
 snakemake --snakefile Snakefile --cores 1 mapped_reads/{A,B}.bam
 ```
 
-5. Sorting read alignments using samtools:
+4. Sorting read alignments using samtools. 
 
+Please append the following rule to the Snakefile.
 ```python
 rule samtools_sort:
     input:
@@ -65,13 +71,14 @@ rule samtools_sort:
         "-O bam {input.bam} > {output.bam}"
 ```
 
+Please execute the following command in the terminal.
 ```bash
-snakemake --snakefile Snakefile --cores 1 mapped_reads/A.bam mapped_reads/B.bam
-snakemake --snakefile Snakefile --cores 1 mapped_reads/{A,B}.bam
+snakemake --snakefile Snakefile --cores 1 sorted_reads/{A,B}.bam
 ```
 
-6. Create an alignment index file:
+5. Create an alignment index file.
 
+Please append the following rule to the Snakefile.
 ```python
 rule samtools_index:
     input:
@@ -82,12 +89,14 @@ rule samtools_index:
         "samtools index {input.bam}"
 ```
 
+Please execute the following command in the terminal.
 ```bash
 snakemake --snakefile Snakefile --cores 1 sorted_reads/{A,B}.bam.bai
 ```
 
-7. Calling genomic variants:
+6. Calling genomic variants.
 
+Please append the following rule to the Snakefile.
 ```python
 SAMPLES = ["A", "B"] # allways at the top of the Snakefile
 
@@ -103,12 +112,14 @@ rule bcftools_call:
         "bcftools call -mv - > {output.vcf}"
 ```
 
+Please execute the following command in the terminal.
 ```bash
 snakemake --snakefile Snakefile --cores 1 calls/all.vcf
 ```
 
-8. Apply a custom script to visualize the results:
+7. Apply a custom script to visualize the results.
 
+Please append the following rule to the Snakefile.
 ```python
 rule plot_quals:
     input:
@@ -118,23 +129,28 @@ rule plot_quals:
     script:
         "scripts/plot-quals.py"
 ```
+
+Please execute the following command in the terminal.
 ```bash
 snakemake --snakefile Snakefile --cores 1 plots/quals.svg
 ```
 
-9. Adding a target rule: Snakemake also accepts rule names as targets 
+8. If nothing  is specified Snakemake will use the first rule as target rule. 
+   That is why we define a target rule called "all".
 
+Please append the following rule as the first rule to the Snakefile.
 ```python
 rule all:
     input:
         "plots/quals.svg"
 ```
 
+Please execute the following command in the terminal.
 ```bash
 snakemake --snakefile Snakefile --cores 1 all
 ```
 
-10. The final Snakefile should look like this
+9. The final Snakefile should look like this
 
 ```python
 SAMPLES = ["A", "B"]
