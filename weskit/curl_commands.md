@@ -14,7 +14,6 @@ run_id=$(curl -vv \
     -F workflow_attachment='@/home/ubuntu/deNBI_workshop/weskit/Snakefile'\
     -F workflow_url="Snakefile" \
     -F workflow_engine_parameters='{
-                    "engine-environment": "/weskit/workflows/environment.sh",
                     "jobs": "1",
                     "cores": "1"
                }' | jq -r .run_id)
