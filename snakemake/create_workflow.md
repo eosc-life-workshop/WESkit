@@ -158,7 +158,7 @@ rule all:
 
 Please execute the following command in the terminal.
 ```bash
-snakemake --snakefile Snakefile --cores 1 all
+snakemake --snakefile Snakefile --forceall --cores 1 all
 ```
 
 10. The final Snakefile should look like this
